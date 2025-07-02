@@ -1,0 +1,6 @@
+# Bases de datos SQLite locales
+/config/inventario_ocana.db
+/config/usuarios_ocana.db
+
+# Archivos de log
+*.log

@@ -1,6 +1,22 @@
+# =============================================
+# ARCHIVOS SENSIBLES (seguridad y datos)
+# =============================================
 # Bases de datos SQLite locales
-/src/config/inventario_ocana.db
-/src/config/usuarios_ocana.db
+/src/database/*.bd
 
-# Archivos de log
+# Archivos de configuración con credenciales
+*.env
+
+# Archivos de registro del sistema
 *.log
+
+# =============================================
+# ARCHIVOS DE ENTORNO (editores y sistemas)
+# =============================================
+# Configuración de IDEs
+.vscode/
+.idea/
+
+# Metadatos de sistemas operativos
+.DS_Store
+Thumbs.db

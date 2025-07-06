@@ -1,5 +1,6 @@
 <?php
 function getDbConnection() {
+    //db.php
     // Ruta absoluta de la base de datos SQLite
     $dbPath = __DIR__ . '/../database/usuarios_ocana.db';
 

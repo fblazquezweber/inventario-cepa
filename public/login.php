@@ -1,4 +1,6 @@
 <?php
+// login.php
+// Procesa la autenticación del usuario con timeout simple
 session_start();
 
 // Cargar helpers
@@ -29,13 +31,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die('Contraseña incorrecta.');
     }
 
-    // 🚩 Seguridad extra: regenerar ID de sesión para evitar fijación de sesión
+    // Regenerar ID de sesión para evitar fijación de sesión
     session_regenerate_id(true);
 
     // Guardar datos en sesión
     $_SESSION['user_id'] = $user['id_usuario'];
     $_SESSION['user_email'] = $user['email'];
     $_SESSION['user_name'] = $user['nombre'];
+    
+    // Inicializar timeout de sesión (60 minutos)
+    initSessionTimeout();
 
     // Forzar no-caché en respuesta de login
     sendNoCacheHeaders();
@@ -48,3 +53,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: index.html');
     exit;
 }
+?>

@@ -40,7 +40,7 @@ function sendNoCacheHeaders() {
 // ===============================
 //PRUEBA const SESSION_TIMEOUT = 60 * 60;
 // Timeout fijo de 60 minutos para todos los usuarios
-const SESSION_TIMEOUT = 15; // 60 minutos en segundos
+const SESSION_TIMEOUT = 60*60; // 60 (3600) minutos en segundos PRUEBA
 
 /**
  * Inicializa el timeout de sesión

@@ -18,7 +18,7 @@ Ofrece una interfaz web sencilla, construida con Bootstrap, para administrar efi
 |---------------|---------------------------|
 | Backend       | PHP 8+                    |
 | Frontend      | Bootstrap 5, JavaScript   |
-| Base de Datos | SQLite (fase de pruebas)  |
+| Base de Datos | SQLite                    |
 | Servidor      | Apache (XAMPP)            |
 
 ---

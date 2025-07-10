@@ -1,7 +1,6 @@
 <?php
-function getDbConnection() {
-    // Ruta absoluta de la base de datos SQLite
-    $dbPath = __DIR__ . '/../database/usuarios_ocana.db';
+function getDbConnection($dbName = 'usuarios_ocana') {
+    $dbPath = __DIR__ . "/../database/{$dbName}.db";
 
     try {
         $pdo = new PDO('sqlite:' . $dbPath);
@@ -10,7 +9,6 @@ function getDbConnection() {
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         return $pdo;
     } catch (PDOException $e) {
-        // En producción podrías registrar el error en lugar de mostrarlo
         die('Error al conectar a la base de datos: ' . htmlspecialchars($e->getMessage()));
     }
 }

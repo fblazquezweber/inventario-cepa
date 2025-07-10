@@ -10,3 +10,5 @@ window.addEventListener('pageshow', function (event) {
   if (emailInput) emailInput.value = "";
   if (passwordInput) passwordInput.value = "";
 });
+
+

@@ -14,7 +14,6 @@ if (!isset($_SESSION['user_id'])) {
   <title>Dashboard - Inventario CEPA</title>
   <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/vendor/all.min.css">
-  <link rel="stylesheet" href="assets/css/custom/estilos.css">
 </head>
 <body>
 
@@ -23,7 +22,15 @@ if (!isset($_SESSION['user_id'])) {
     <a class="navbar-brand" href="#">
       <i class="fas fa-boxes me-2"></i> Inventario CEPA
     </a>
-    <div class="collapse navbar-collapse">
+
+    <!-- Botón hamburguesa -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContenido"
+      aria-controls="navbarContenido" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Contenido colapsable -->
+    <div class="collapse navbar-collapse" id="navbarContenido">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
           <span class="nav-link">
@@ -40,6 +47,9 @@ if (!isset($_SESSION['user_id'])) {
     </div>
   </div>
 </nav>
+
+
+
 
 <main class="container">
   <div class="row">

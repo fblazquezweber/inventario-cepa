@@ -1,43 +1,14 @@
 <?php
-<<<<<<< Updated upstream
-require_once __DIR__ . '/../src/helpers/auth.php';
-requireLogin();
-=======
 require_once __DIR__ . '/../src/helpers/session.php';
-
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.html');
     exit;
 }
->>>>>>> Stashed changes
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<<<<<<< Updated upstream
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dashboard</title>
-    <!-- Bootstrap CSS CDN -->
-    <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/vendor/all.min.css">
-    <link rel="stylesheet" href="assets/css/custom/estilos.css">
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="#">Inventario Cepa</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <span class="nav-link">Hola, <?= htmlspecialchars($_SESSION['user_name']); ?></span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="logout.php">Cerrar sesión</a>
-                    </li>
-                </ul>
-=======
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard - Inventario CEPA</title>
@@ -99,18 +70,10 @@ if (!isset($_SESSION['user_id'])) {
               <a href="inventario.php" class="btn btn-primary">
                 <i class="fas fa-eye me-1"></i> Ver inventario
               </a>
->>>>>>> Stashed changes
             </div>
+          </div>
         </div>
-    </nav>
 
-<<<<<<< Updated upstream
-    <main class="container">
-        <h1>Dashboard</h1>
-        <p>Bienvenido <?= htmlspecialchars($_SESSION['user_name']); ?>, has iniciado sesión correctamente.</p>
-        <p>Aquí puedes poner tu contenido privado: inventario, reportes, etc.</p>
-    </main>
-=======
         <div class="col-md-6 col-lg-4 mb-3">
           <div class="card h-100">
             <div class="card-body text-center">
@@ -145,9 +108,5 @@ if (!isset($_SESSION['user_id'])) {
 <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
 <script src="assets/js/vendor/all.min.js"></script>
 <script src="assets/js/custom/disable-bfcache.js"></script>
->>>>>>> Stashed changes
-
-    <!-- Bootstrap JS Bundle CDN (opcional) -->
-    <script src="assets/js/custom/disable-bfcache.js"></script>
 </body>
 </html>

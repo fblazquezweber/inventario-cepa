@@ -1,3 +1,6 @@
 <?php
-require_once __DIR__ . '/../src/helpers/auth.php';
-logout();
+session_start();
+session_unset();
+session_destroy();
+header("Location: index.html"); // O donde quieras redirigir
+exit;

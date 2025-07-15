@@ -49,6 +49,13 @@
     </div>
   <?php endif; ?>
 
+  <?php if (!empty($actualizacionExitoso) && $actualizacionExitoso === true): ?>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>¡Éxito!</strong> Objeto actualizado correctamente.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+  </div>
+<?php endif; ?>
+
   <h1 class="h3 mb-4">
     <i class="fas fa-box text-primary me-2"></i>
     <?= $modoEdicion ? 'Editar Objeto' : 'Registrar Nuevo Objeto' ?>
@@ -66,8 +73,13 @@
 
   <form class="row g-2 mb-4" method="POST">
     <div class="col-auto">
-      <input type="text" name="busqueda" class="form-control"
-             placeholder="Código interno o Nº serie" required>
+      <input 
+        type="text" 
+        name="busqueda" 
+        class="form-control"
+        placeholder="Código interno o Nº serie" 
+        maxlength="50"
+        required>
     </div>
     <div class="col-auto">
       <button name="buscar" type="submit" class="btn btn-outline-primary">Buscar</button>
@@ -93,21 +105,29 @@
 
     <div class="col-md-6">
       <label class="form-label">Categoría</label>
-      <select name="id_categoria" class="form-select" required>
+      <select name="categoria" class="form-select" required>
         <option value="">— Selecciona —</option>
         <?php foreach ($categorias as $cat): ?>
-          <option value="<?= $cat['id_categoria'] ?>"
-            <?= $cat['id_categoria'] == $datos['id_categoria'] ? 'selected' : '' ?>>
-            <?= htmlspecialchars($cat['nombre_categoria']) ?>
+          <option value="<?= htmlspecialchars($cat) ?>"
+          <?= $cat == $datos['categoria'] ? 'selected' : '' ?>>
+          <?= htmlspecialchars($cat) ?>
           </option>
         <?php endforeach ?>
+        
       </select>
     </div>
+    
 
-    <div class="col-12">
+    <!-- PRUEBA -->
+    <div class="col-6">
       <label class="form-label">Descripción</label>
       <textarea name="descripcion" class="form-control" rows="3"><?= htmlspecialchars($datos['descripcion']) ?></textarea>
     </div>
+    <div class="col-6"> 
+      <label class="form-label">Observaciones</label>
+      <textarea name="observacion" class="form-control" rows="3"><?= htmlspecialchars($datos['observacion']) ?></textarea>
+    </div>
+    <!-- FIN PRUEBA -->
 
     <div class="col-md-4">
       <label class="form-label">Marca</label>
@@ -177,7 +197,7 @@
         <div class="card-body">
           <div class="mb-3">
             <label class="form-label">Motivo</label>
-            <textarea name="motivo" class="form-control" rows="2" <?= in_array($datos['estado'], $estadosConMotivo) ? 'required' : '' ?>><?= htmlspecialchars($datos['motivo']) ?></textarea>
+            <textarea name="motivo" class="form-control" rows="2" <?= in_array($datos['estado'], $estadosConMotivo) ? 'required' : '' ?>><?= htmlspecialchars($datos['motivo'] ?? '') ?></textarea>
           </div>
         </div>
       </div>

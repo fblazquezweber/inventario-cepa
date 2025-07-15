@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
     'numero_serie',
     'codigo_interno',
     'ubicacion',
-    'motivo'
+    'motivo',
+    'observacion'
   ];
 
   campos.forEach(function(name) {

@@ -2,7 +2,7 @@
 # ARCHIVOS SENSIBLES (seguridad y datos)
 # =============================================
 # Bases de datos SQLite locales
-/src/database/*.db
+# /src/database/*.db
 
 # Archivos de configuración con credenciales
 *.env

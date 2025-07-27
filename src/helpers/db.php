@@ -1,5 +1,11 @@
 <?php
 function getDbConnection($dbName = 'usuarios_ocana') {
+    // Solo se permiten estos nombres de base de datos
+    $allowed = ['usuarios_ocana', 'inventario_ocana'];
+    if (!in_array($dbName, $allowed)) {
+        die("Nombre de base de datos no permitido.");
+    }
+
     $dbPath = __DIR__ . "/../database/{$dbName}.db";
 
     try {

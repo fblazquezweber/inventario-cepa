@@ -1,34 +1,25 @@
 <?php
 require_once __DIR__ . '/../helpers/historial_actualizaciones.php';
+require_once __DIR__ . '/../helpers/inventario_helper.php';
+require_once __DIR__ . '/../helpers/inventario_validaciones.php';
+require_once __DIR__ . '/../helpers/historial_helper.php';
+
 // Inicialización de variables
 $modoEdicion      = false;
 $id_objeto        = null; // Esto contendrá el ID del objeto si estamos en modo edición
 $errores          = [];
 $registroExitoso  = false; // Para mostrar alerta tras inserción de nuevo objeto
 $actualizacionExitoso = false; // Para mostrar alerta tras actualización de objeto existente
-
-// Datos iniciales del formulario (para un nuevo registro)
 $datos = [
-    'nombre_objeto'      => '',
-    'descripcion'        => '',
-    'observacion'        => '',
-    'categoria'          => '',
-    'marca'              => '',
-    'modelo'             => '',
-    'numero_serie'       => '',
-    'codigo_interno'     => '',
-    'fecha_adquisicion'  => '',
-    'valor_adquisicion'  => '',
-    'estado'             => 'Operativo', // Estado por defecto para nuevos objetos
-    'ubicacion'          => '',
+    'nombre_objeto'      => '', 'descripcion' => '', 'categoria' => '',
+    'marca'              => '', 'modelo' => '', 'numero_serie' => '', 'codigo_interno' => '',
+    'fecha_adquisicion'  => '', 'valor_adquisicion' => '', 'estado' => 'Operativo',
+    'ubicacion'          => '', 'observacion' => ''
 ];
-
-// Cargar categorías para el select (siempre necesario)
-$categorias = ['Audiovisuales', 'Informática', 'Mobiliario'];
-
-// Estados permitidos y aquellos que requieren motivo
-$estadosConMotivo = ['Mantenimiento', 'Préstamo', 'Inactivo', 'Baja'];
-$estados = ['Operativo', 'Mantenimiento', 'Préstamo', 'Inactivo', 'Baja'];
+// Datos iniciales del formulario (para un nuevo registro)
+$categorias = ['AUDIOVISUALES', 'INFORMÁTICA', 'MOBILIARIO', 'HERRAMIENTAS', 'LABORATORIO', 'LIBROS', 'OTROS'];
+$estados    = ['OPERATIVO', 'MANTENIMIENTO', 'PRÉSTAMO', 'INACTIVO', 'BAJA'];
+$estadosConMotivo = ['MANTENIMIENTO', 'PRÉSTAMO', 'INACTIVO', 'BAJA'];
 
 // --- Lógica de Manejo de Solicitudes POST ---
 
@@ -55,6 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
         if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $modoEdicion = true;
             $id_objeto   = $row['id_objeto'];
+            $row['categoria'] = strtoupper(trim($row['categoria']));
+            $row['estado']    = strtoupper(trim($row['estado']));
             $datos       = $row; // Cargar los datos del objeto encontrado
             // Nota: Aquí no reinicializamos $datos si la búsqueda tiene éxito.
             // La variable $datos ya contendrá el objeto buscado.
@@ -77,53 +70,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
 // 2. Procesar alta/edición (botón 'guardar')
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar'])) {
     // Captura los datos del formulario (esto sobrescribirá los datos cargados por la búsqueda)
-    foreach ($datos as $k => &$v) {
-        if (isset($_POST[$k])) {
-            $v = trim($_POST[$k]);
-        }
-    }
-    unset($v); // Romper la referencia al último elemento
+    $datos = capturarDatosInventario($_POST);
+
+    // Convertir ciertos campos a mayúsculas para garantizar uniformidad
+    $datos['categoria'] = strtoupper(trim($datos['categoria']));
+    $datos['estado']    = strtoupper(trim($datos['estado']));
 
     $estadoAnterior = null; // Inicializar para nuevo registro
+
+    $errores = validarInventario($datos, $_POST['motivo'] ?? '', $estadosConMotivo);
     
 
-
-    // --- Validaciones ---
-    if (trim($datos['nombre_objeto']) === '') {
-        $errores[] = "El nombre del objeto es obligatorio.";
-    }
-    if (trim($datos['categoria']) === '') {
-        $errores[] = "Debe seleccionar una categoría.";
-    }
-    if (trim($datos['numero_serie']) === '') {
-        $errores[] = "El número de serie es obligatorio.";
-    }
-    if (trim($datos['codigo_interno']) === '') {
-        $errores[] = "El código interno es obligatorio.";
-    }
-    
-    // Validar motivo si el estado lo requiere
-    if (in_array($datos['estado'], $estadosConMotivo) && trim($_POST['motivo'] ?? '') === '') {
-    $errores[] = "Debe proporcionar un motivo para el estado '{$datos['estado']}'.";
-}
 
     // --- Validación de Duplicados (Mejorada para Edición) ---
     // Solo verifica duplicados de codigo_interno y numero_serie si son diferentes al objeto actual
     // Si $id_objeto es null (nuevo registro), usará 0 para que la condición != siempre sea verdadera.
-    $stmtVerif = $pdo->prepare("
-        SELECT id_objeto FROM inventario 
-        WHERE (codigo_interno = :ci OR numero_serie = :ns) 
-        AND id_objeto != :id_obj_actual
-    ");
-    $stmtVerif->execute([
-        'ci'           => $datos['codigo_interno'],
-        'ns'           => $datos['numero_serie'],
-        'id_obj_actual' => $id_objeto ?? 0 // Excluye el ID del objeto actual si estamos editando
-    ]);
-    if ($stmtVerif->fetch()) { // Si encuentra alguna fila, significa que el código/serie ya lo tiene OTRO objeto.
-        $errores[] = "Ya existe otro objeto con ese código interno o número de serie.";
-    }
-
+    if (existeDuplicadoInventario($pdo, $datos, $id_objeto ?? 0)) {
+    $errores[] = "Ya existe otro objeto con ese código interno o número de serie.";
+}
     // --- Procesamiento si no hay errores ---
     if (empty($errores)) {
         try {
@@ -133,47 +97,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar'])) {
                 //PRUEBA
                 // ✅ Recuperar los valores anteriores ANTES del UPDATE
                 //$stmtOldData = $pdo->prepare("SELECT estado, motivo, nombre_objeto, numero_serie, codigo_interno FROM inventario WHERE id_objeto = ?");
-                $stmtOldData = $pdo->prepare("SELECT estado, nombre_objeto, numero_serie, codigo_interno FROM inventario WHERE id_objeto = ?");
-
-                $stmtOldData->execute([$id_objeto]);
-                $valoresAnteriores = $stmtOldData->fetch(PDO::FETCH_ASSOC);
-
-                $stmtUltimoMotivo = $pdo->prepare("
-                SELECT motivo FROM movimientos_inventario 
-                WHERE id_objeto = ? 
-                ORDER BY fecha_movimiento DESC 
-                LIMIT 1
-                ");
-                $stmtUltimoMotivo->execute([$id_objeto]);
-                $ultimoMovimiento = $stmtUltimoMotivo->fetch(PDO::FETCH_ASSOC);
-                $motivoAnterior = $ultimoMovimiento['motivo'] ?? null;
-           
-                $estadoAnterior = $valoresAnteriores['estado'] ?? null;
-                
-                //FIN PRUEBA
-
-
-                //PRUEBA 2
-                // Comparar campos clave y registrar cambios en historial_actualizaciones
+                require_once __DIR__ . '/../helpers/historial_helper.php';
+                $valoresAnteriores = obtenerValoresAnteriores($pdo, $id_objeto);
+                $motivoAnterior    = obtenerUltimoMotivo($pdo, $id_objeto);
+                $estadoAnterior    = $valoresAnteriores['estado'] ?? null;
                 $camposATrastrear = ['nombre_objeto', 'numero_serie', 'codigo_interno'];
-                foreach ($camposATrastrear as $campo) {
-                    $valorAnterior = $valoresAnteriores[$campo] ?? null;
-                    $valorNuevo = $datos[$campo];
-                    if ($valorAnterior !== $valorNuevo) {
-                        $stmtHist = $pdo->prepare("
-                        INSERT INTO historial_actualizaciones (
-                        id_objeto, id_usuario, campo_modificado, valor_anterior, valor_nuevo) 
-                        VALUES (:id_objeto, :id_usuario, :campo_modificado, :valor_anterior, :valor_nuevo)
-                        ");
-                        $stmtHist->execute([
-                            'id_objeto'        => $id_objeto,
-                            'id_usuario'       => $_SESSION['user_id'],
-                            'campo_modificado' => $campo,
-                            'valor_anterior'   => $valorAnterior,
-                            'valor_nuevo'      => $valorNuevo
-                        ]);
-                    }
-                }
+                registrarCambiosHistorial($pdo, $id_objeto, $_SESSION['user_id'], $valoresAnteriores, $datos, $camposATrastrear);
+
 
 
 
@@ -279,6 +209,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar'])) {
                 $stmt = $pdo->prepare("SELECT * FROM inventario WHERE id_objeto = ?");
                 $stmt->execute([$id_objeto]);
                 $datos = $stmt->fetch(PDO::FETCH_ASSOC);
+                $datos['categoria'] = strtoupper(trim($datos['categoria']));
+                $datos['estado']    = strtoupper(trim($datos['estado']));
             }
 
 
